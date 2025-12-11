@@ -1,11 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CPR Hero Price Calculator</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HTML2PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Configuration & Styles -->
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -23,6 +29,7 @@
               'glow-blue': 'glowBlue 2s infinite',
               'glow-red': 'glowRed 2s infinite',
               'text-glow-red': 'textGlowRed 2s infinite',
+              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
             },
             keyframes: {
               glowBlue: {
@@ -36,6 +43,10 @@
               textGlowRed: {
                 '0%, 100%': { textShadow: '0 0 4px rgba(220, 53, 69, 0.5)' },
                 '50%': { textShadow: '0 0 15px rgba(220, 53, 69, 1)' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
               }
             }
           }
@@ -43,23 +54,11 @@
       }
     </script>
     <style>
-      /* Custom scrollbar for better aesthetics */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      .dark ::-webkit-scrollbar-track {
-        background: #2d2d2d;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #f1f1f1; }
+      .dark ::-webkit-scrollbar-track { background: #2d2d2d; }
+      ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
   <script type="importmap">
 {
@@ -71,7 +70,510 @@
 }
 </script>
 </head>
-  <body class="bg-gray-50 dark:bg-brand-bgDark transition-colors duration-300">
-    <div id="root"></div>
+  <body class="bg-gray-50 dark:bg-brand-bgDark transition-colors duration-300 text-gray-900 dark:text-gray-100">
+    
+    <div class="min-h-screen p-4 md:p-8">
+      <div class="max-w-5xl mx-auto space-y-8">
+        
+        <!-- Header Section -->
+        <header class="bg-white dark:bg-brand-bgDarkSec p-6 rounded-2xl shadow-lg text-center relative overflow-hidden">
+          
+          <!-- Controls -->
+          <div class="flex justify-center gap-4 mb-6 flex-wrap z-20 relative">
+            <!-- Language Toggle -->
+            <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full shadow-inner border border-gray-200 dark:border-gray-700">
+              <span id="lbl-lang-en" class="text-xs font-semibold text-gray-500">English</span>
+              <button id="btn-toggle-lang" class="relative w-10 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors focus:outline-none">
+                <div id="dot-lang" class="absolute top-1 left-1 w-3 h-3 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
+              </button>
+              <span id="lbl-lang-ms" class="text-xs font-semibold text-gray-500">Bahasa</span>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full shadow-inner border border-gray-200 dark:border-gray-700">
+              <span id="lbl-theme-light" class="text-xs font-semibold text-gray-500">Light</span>
+              <button id="btn-toggle-theme" class="relative w-10 h-5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors focus:outline-none">
+                <div id="dot-theme" class="absolute top-1 left-1 w-3 h-3 bg-white rounded-full shadow-md transform transition-transform duration-300 translate-x-5"></div>
+              </button>
+              <span id="lbl-theme-dark" class="text-xs font-semibold text-blue-400">Dark</span>
+            </div>
+          </div>
+
+          <div class="relative z-10 flex flex-col items-center">
+            <!-- Logo -->
+            <div class="mb-4">
+              <img 
+                src="logo.png" 
+                alt="CPR Hero Logo" 
+                class="h-32 w-32 object-contain rounded-full shadow-md bg-white"
+                onerror="this.src='https://placehold.co/150x150/white/dc3545?text=CPR+Hero';this.onerror=null;"
+              />
+            </div>
+
+            <h1 data-t="mainTitle" class="text-4xl md:text-5xl font-bold text-brand-red mb-2 tracking-tight">CPR Hero</h1>
+            <p data-t="subtitle" class="text-lg text-gray-500 dark:text-gray-400 font-medium">Professional CPR Training Price Calculator</p>
+          </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-8">
+          
+          <!-- Calculator Form -->
+          <div class="bg-white dark:bg-brand-bgDarkSec p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+            <div class="space-y-6">
+              <!-- Course Type -->
+              <div class="space-y-2">
+                <label data-t="labelCourse" class="block text-sm font-bold text-gray-700 dark:text-gray-200">Course Type:</label>
+                <div class="relative">
+                  <select id="input-course" class="w-full p-4 pl-4 pr-10 rounded-xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 focus:border-brand-red focus:ring-0 text-gray-900 dark:text-white transition-all appearance-none">
+                    <!-- Options populated by JS -->
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location -->
+              <div class="space-y-2">
+                <label data-t="labelLocation" class="block text-sm font-bold text-gray-700 dark:text-gray-200">Location:</label>
+                <div class="relative">
+                  <select id="input-location" class="w-full p-4 pl-4 pr-10 rounded-xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 focus:border-brand-red focus:ring-0 text-gray-900 dark:text-white transition-all appearance-none">
+                    <!-- Options populated by JS -->
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Participants -->
+              <div class="space-y-2">
+                <label data-t="labelParticipants" class="block text-sm font-bold text-gray-700 dark:text-gray-200">Number of Participants (Max 25):</label>
+                <input id="input-participants" type="number" min="1" max="25" value="1" class="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 focus:border-brand-red focus:ring-0 text-gray-900 dark:text-white transition-all" />
+              </div>
+
+              <div class="pt-4 flex justify-center">
+                <button id="btn-calculate" data-t="btnCalculate" class="px-8 py-4 bg-brand-red hover:bg-brand-darkRed text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-lg w-full md:w-auto min-w-[200px]">
+                  Calculate Price
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Section -->
+          <div id="results-section" class="hidden">
+            <!-- Content injected by JS -->
+          </div>
+
+          <!-- Reference Table -->
+          <div class="mt-12 bg-white dark:bg-brand-bgDarkSec p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <h3 data-t="formulaTitle" class="text-2xl font-bold text-center mb-6 text-brand-red">Complete Formula Reference Table</h3>
+            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-600">
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-white uppercase bg-brand-red">
+                  <tr>
+                    <th scope="col" data-t="thParticipants" class="px-6 py-4 text-center border-r border-red-400">Participants</th>
+                    <th scope="col" data-t="thDiscount" class="px-6 py-4 text-center border-r border-red-400">Discount</th>
+                    <th scope="col" data-t="thFormula" class="px-6 py-4 text-center border-r border-red-400">Formula</th>
+                    <th scope="col" data-t="thAsas" class="px-6 py-4 text-center border-r border-red-400">Kelas Asas</th>
+                    <th scope="col" data-t="thLengkap" class="px-6 py-4 text-center">Kelas Lengkap</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body" class="text-gray-700 dark:text-gray-300">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+            <p data-t="footerNote" class="mt-6 text-xs text-center text-gray-500 dark:text-gray-400 font-medium tracking-wide">
+              *Rounded from...
+            </p>
+          </div>
+
+        </main>
+        
+        <footer class="text-center text-gray-400 text-sm py-4">
+          &copy; <span id="year"></span> CPR Hero. VER18
+        </footer>
+      </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+      // --- Constants ---
+      const DISCOUNT_TIERS = [
+        { min: 1, max: 1, discountPercent: 0, asasPrice: 250, lengkapPrice: 350 },
+        { min: 2, max: 4, discountPercent: 4, asasPrice: 240, lengkapPrice: 336 },
+        { min: 5, max: 9, discountPercent: 7, asasPrice: 233, lengkapPrice: 326 },
+        { min: 10, max: 14, discountPercent: 15, asasPrice: 213, lengkapPrice: 298, label: 'Recommended', style: 'blue' },
+        { min: 15, max: 19, discountPercent: 17, asasPrice: 208, lengkapPrice: 291 },
+        { min: 20, max: 999, discountPercent: 25, asasPrice: 188, lengkapPrice: 263, label: 'Most Popular', style: 'red' }
+      ];
+
+      const LOCATION_FEES = {
+        kt: 0,
+        seremban: 100,
+        onsite: 100
+      };
+
+      const TRANSLATIONS = {
+        en: {
+          mainTitle: 'CPR Hero',
+          subtitle: 'Professional CPR Training Price Calculator',
+          labelCourse: 'Course Type:',
+          labelLocation: 'Location:',
+          labelParticipants: 'Number of Participants (Max 25):',
+          btnCalculate: 'Calculate Price',
+          titleNormal: 'Normal Price (Without Discount)',
+          titleDiscount: 'Discounted Price (Group Discount Applied)',
+          downloadNormalTitle: 'Download Normal Price Quotation',
+          downloadDiscountTitle: 'Download Discounted Price Quotation',
+          btnNormalDocx: 'DOCX Format',
+          btnDiscountDocx: 'DOCX Format',
+          baseCourse: 'Base Course Fee',
+          locationFee: 'Location Fee',
+          subtotal: 'Subtotal per Person',
+          total: 'TOTAL',
+          discount: 'Discount Applied',
+          formulaTitle: 'Complete Formula Reference Table',
+          courseOptions: {
+            select: '-- Select --',
+            asas: 'Kelas Asas | Little Hero (4 hours) - RM250',
+            lengkap: 'Kelas Lengkap | Super Hero (6 hours) - RM350'
+          },
+          locationOptions: {
+            select: '-- Select --',
+            kt: 'Kuala Terengganu (CPR Hero Premises) - RM0',
+            seremban: 'Seremban (CPR Hero Premises) - +RM100',
+            onsite: 'On-site (Your Location) - +RM100'
+          },
+          tableHeaders: {
+            participants: 'Participants',
+            discount: 'Discount',
+            formula: 'Formula',
+            asas: 'Kelas Asas',
+            lengkap: 'Kelas Lengkap'
+          },
+          footerNote: '*Rounded from: 212.5 → 213 | 297.5 → 298 | 207.5 → 208 | 290.5 → 291 | 187.5 → 188 | 262.5 → 263'
+        },
+        ms: {
+          mainTitle: 'CPR Hero',
+          subtitle: 'Kalkulator Harga Latihan CPR Profesional',
+          labelCourse: 'Jenis Kursus:',
+          labelLocation: 'Lokasi:',
+          labelParticipants: 'Bilangan Peserta (Maksimum 25):',
+          btnCalculate: 'Kira Harga',
+          titleNormal: 'Harga Biasa (Tanpa Diskaun)',
+          titleDiscount: 'Harga Diskaun (Diskaun Kumpulan Digunakan)',
+          downloadNormalTitle: 'Muat Turun Sebut Harga Biasa',
+          downloadDiscountTitle: 'Muat Turun Sebut Harga Diskaun',
+          btnNormalDocx: 'Format DOCX',
+          btnDiscountDocx: 'Format DOCX',
+          baseCourse: 'Yuran Kursus Asas',
+          locationFee: 'Yuran Lokasi',
+          subtotal: 'Jumlah Kecil per Orang',
+          total: 'JUMLAH KESELURUHAN',
+          discount: 'Diskaun Digunakan',
+          formulaTitle: 'Jadual Rujukan Formula Lengkap',
+          courseOptions: {
+            select: '-- Pilih --',
+            asas: 'Kelas Asas | Little Hero (4 jam) - RM250',
+            lengkap: 'Kelas Lengkap | Super Hero (6 jam) - RM350'
+          },
+          locationOptions: {
+            select: '-- Pilih --',
+            kt: 'Kuala Terengganu (Premis CPR Hero) - RM0',
+            seremban: 'Seremban (Premis CPR Hero) - +RM100',
+            onsite: 'Di Lokasi Anda (On-site) - +RM100'
+          },
+          tableHeaders: {
+            participants: 'Peserta',
+            discount: 'Diskaun',
+            formula: 'Formula',
+            asas: 'Kelas Asas',
+            lengkap: 'Kelas Lengkap'
+          },
+          footerNote: '*Dibundarkan dari: 212.5 → 213 | 297.5 → 298 | 207.5 → 208 | 290.5 → 291 | 187.5 → 188 | 262.5 → 263'
+        }
+      };
+
+      // --- State ---
+      let state = {
+        lang: 'en',
+        theme: 'dark',
+        courseType: '',
+        location: '',
+        participants: 1,
+        calculationData: null
+      };
+
+      // --- DOM Elements ---
+      const els = {
+        html: document.documentElement,
+        btnLang: document.getElementById('btn-toggle-lang'),
+        dotLang: document.getElementById('dot-lang'),
+        lblLangEn: document.getElementById('lbl-lang-en'),
+        lblLangMs: document.getElementById('lbl-lang-ms'),
+        
+        btnTheme: document.getElementById('btn-toggle-theme'),
+        dotTheme: document.getElementById('dot-theme'),
+        lblThemeLight: document.getElementById('lbl-theme-light'),
+        lblThemeDark: document.getElementById('lbl-theme-dark'),
+        
+        inputCourse: document.getElementById('input-course'),
+        inputLocation: document.getElementById('input-location'),
+        inputParticipants: document.getElementById('input-participants'),
+        btnCalculate: document.getElementById('btn-calculate'),
+        
+        resultsSection: document.getElementById('results-section'),
+        tableBody: document.getElementById('table-body'),
+        year: document.getElementById('year')
+      };
+
+      // --- Logic Functions ---
+      function calculatePrice(courseType, location, participants) {
+        const tier = DISCOUNT_TIERS.find(t => participants >= t.min && participants <= t.max) || DISCOUNT_TIERS[DISCOUNT_TIERS.length - 1];
+        const locationFee = LOCATION_FEES[location] || 0;
+        const normalBasePrice = courseType === 'asas' ? 250 : 350;
+        const discountedBasePrice = courseType === 'asas' ? tier.asasPrice : tier.lengkapPrice;
+
+        const normalPricePerPerson = normalBasePrice + locationFee;
+        const discountedPricePerPerson = discountedBasePrice + locationFee;
+
+        return {
+          courseType, location, participants, tier, locationFee,
+          normalBasePrice, discountedBasePrice,
+          normalPricePerPerson, discountedPricePerPerson,
+          normalTotal: normalPricePerPerson * participants,
+          discountedTotal: discountedPricePerPerson * participants,
+          savings: (normalPricePerPerson * participants) - (discountedPricePerPerson * participants)
+        };
+      }
+
+      function generateQuotation(priceType, format, data, lang) {
+        const t = TRANSLATIONS[lang];
+        const date = new Date().toLocaleDateString('en-MY');
+        const courseName = data.courseType === 'asas' ? t.courseOptions.asas : t.courseOptions.lengkap;
+        const locationName = t.locationOptions[data.location];
+
+        let content = '';
+        if (priceType === 'normal') {
+          content = `CPR HERO - PRICE QUOTATION (VER18)\n\nDate: ${date}\nQuotation No: CPR-${Date.now()}\n\n═══════════════════════════════════════════════════\n\nCOURSE DETAILS:\nCourse Type: ${courseName}\nLocation: ${locationName}\nNumber of Participants: ${data.participants} persons\n\n═══════════════════════════════════════════════════\n\nPRICING BREAKDOWN (NORMAL PRICE):\n\nBase Course Fee: RM${data.normalBasePrice} × ${data.participants} = RM${data.normalBasePrice * data.participants}\nLocation Fee: RM${data.locationFee} × ${data.participants} = RM${data.locationFee * data.participants}\n\nTOTAL AMOUNT: RM${data.normalTotal.toFixed(2)}\n\n═══════════════════════════════════════════════════\n\nPAYMENT TERMS:\n- 50% deposit required to secure booking\n- Full payment due 7 days before class date\n- Cancellation policy: 14 days notice for refund (less 10% admin fee)\n\nCONTACT INFORMATION:\nCPR Hero Malaysia\nEmail: info@cprhero.com.my\nPhone: +60X-XXX-XXXX\n\n═══════════════════════════════════════════════════\n\nThank you for choosing CPR Hero!\nThis quotation is valid for 30 days from the date of issue.`;
+        } else {
+          content = `CPR HERO - PRICE QUOTATION (VER18)\n\nDate: ${date}\nQuotation No: CPR-${Date.now()}\n\n═══════════════════════════════════════════════════\n\nCOURSE DETAILS:\nCourse Type: ${courseName}\nLocation: ${locationName}\nNumber of Participants: ${data.participants} persons\n\n═══════════════════════════════════════════════════\n\nPRICING BREAKDOWN (${data.tier.discountPercent}% GROUP DISCOUNT APPLIED):\n\nBase Course Fee (Discounted): RM${data.discountedBasePrice} × ${data.participants} = RM${data.discountedBasePrice * data.participants}\nLocation Fee: RM${data.locationFee} × ${data.participants} = RM${data.locationFee * data.participants}\n\nTOTAL AMOUNT: RM${data.discountedTotal.toFixed(2)}\n\nDiscount Applied: ${data.tier.discountPercent}% OFF\nAmount Saved: RM${data.savings.toFixed(2)}\n\n═══════════════════════════════════════════════════\n\nPAYMENT TERMS:\n- 50% deposit required to secure booking\n- Full payment due 7 days before class date\n- Cancellation policy: 14 days notice for refund (less 10% admin fee)\n\nCONTACT INFORMATION:\nCPR Hero Malaysia\nEmail: info@cprhero.com.my\nPhone: +60X-XXX-XXXX\n\n═══════════════════════════════════════════════════\n\nThank you for choosing CPR Hero!\nThis quotation is valid for 30 days from the date of issue.`;
+        }
+
+        if (format === 'docx') {
+          const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `CPR_Hero_${priceType}_VER18_${Date.now()}.doc`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+           alert("PDF generation requires external libraries (html2pdf) to strictly render DOM elements. Text-based logic provided for DOCX.");
+        }
+      }
+
+      // --- Render Functions ---
+      function updateLanguageUI() {
+        const t = TRANSLATIONS[state.lang];
+        
+        // Update Static Text
+        document.querySelectorAll('[data-t]').forEach(el => {
+          const key = el.getAttribute('data-t');
+          if (t[key]) el.textContent = t[key];
+        });
+
+        // Update Toggle Styles
+        if (state.lang === 'en') {
+          els.dotLang.classList.remove('translate-x-5');
+          els.lblLangEn.classList.add('text-brand-red');
+          els.lblLangEn.classList.remove('text-gray-500');
+          els.lblLangMs.classList.remove('text-brand-red');
+          els.lblLangMs.classList.add('text-gray-500');
+        } else {
+          els.dotLang.classList.add('translate-x-5');
+          els.lblLangEn.classList.remove('text-brand-red');
+          els.lblLangEn.classList.add('text-gray-500');
+          els.lblLangMs.classList.add('text-brand-red');
+          els.lblLangMs.classList.remove('text-gray-500');
+        }
+
+        // Update Headers specifically (nested keys)
+        document.querySelector('[data-t="thParticipants"]').textContent = t.tableHeaders.participants;
+        document.querySelector('[data-t="thDiscount"]').textContent = t.tableHeaders.discount;
+        document.querySelector('[data-t="thFormula"]').textContent = t.tableHeaders.formula;
+        document.querySelector('[data-t="thAsas"]').textContent = t.tableHeaders.asas;
+        document.querySelector('[data-t="thLengkap"]').textContent = t.tableHeaders.lengkap;
+
+        // Update Select Options
+        els.inputCourse.innerHTML = `
+          <option value="">${t.courseOptions.select}</option>
+          <option value="asas">${t.courseOptions.asas}</option>
+          <option value="lengkap">${t.courseOptions.lengkap}</option>
+        `;
+        els.inputCourse.value = state.courseType;
+
+        els.inputLocation.innerHTML = `
+          <option value="">${t.locationOptions.select}</option>
+          <option value="kt">${t.locationOptions.kt}</option>
+          <option value="seremban">${t.locationOptions.seremban}</option>
+          <option value="onsite">${t.locationOptions.onsite}</option>
+        `;
+        els.inputLocation.value = state.location;
+        
+        // Re-render complex sections
+        renderTable();
+        if (state.calculationData) renderResults();
+      }
+
+      function renderTable() {
+        const t = TRANSLATIONS[state.lang];
+        els.tableBody.innerHTML = DISCOUNT_TIERS.map((tier, index) => {
+          const participantsText = tier.max > 100 ? `${tier.min} & more` : (tier.min === tier.max ? `${tier.min}` : `${tier.min}-${tier.max}`);
+          
+          let rowClass = "border-b border-gray-200 dark:border-gray-600 ";
+          rowClass += index % 2 !== 0 ? "bg-gray-50 dark:bg-gray-800 " : "bg-white dark:bg-brand-bgDarkSec ";
+          
+          if (tier.style === 'blue') {
+            rowClass += " animate-glow-blue border-2 border-blue-400 dark:border-blue-500 z-10 relative";
+          } else if (tier.style === 'red') {
+            rowClass += " animate-glow-red border-2 border-brand-red dark:border-red-500 z-10 relative";
+          }
+
+          const labelHtml = tier.label ? 
+            `<span class="absolute top-1 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full text-white shadow-sm whitespace-nowrap ${tier.style === 'red' ? 'bg-red-600' : 'bg-blue-500'}">${tier.label}</span>` 
+            : '';
+
+          const discountClass = tier.style === 'red' ? 'animate-text-glow-red font-bold text-red-500 dark:text-red-400' : '';
+
+          return `
+            <tr class="${rowClass}">
+              <td class="px-6 py-4 text-center border-r border-gray-200 dark:border-gray-600 font-bold relative">
+                ${participantsText}
+                ${labelHtml}
+              </td>
+              <td class="px-6 py-4 text-center border-r border-gray-200 dark:border-gray-600 font-medium text-brand-red">
+                <span class="${discountClass}">${tier.discountPercent}%</span>
+              </td>
+              <td class="px-6 py-4 text-center border-r border-gray-200 dark:border-gray-600 font-mono text-xs md:text-sm">
+                250 &times; ${(1 - tier.discountPercent / 100).toFixed(2)}
+              </td>
+              <td class="px-6 py-4 text-center border-r border-gray-200 dark:border-gray-600">
+                RM${tier.asasPrice}${tier.discountPercent > 0 ? '*' : ''}
+              </td>
+              <td class="px-6 py-4 text-center">
+                RM${tier.lengkapPrice}${tier.discountPercent > 0 ? '*' : ''}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function renderResults() {
+        if (!state.calculationData) return;
+        const d = state.calculationData;
+        const t = TRANSLATIONS[state.lang];
+
+        els.resultsSection.className = "grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in-up block";
+        els.resultsSection.innerHTML = `
+          <!-- Normal Price Card -->
+          <div class="bg-white dark:bg-brand-bgDarkSec rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100 text-center">${t.titleNormal}</h3>
+            </div>
+            <div class="p-6 space-y-4 flex-grow text-gray-700 dark:text-gray-300">
+              <div class="flex justify-between"><span>${t.baseCourse}:</span><span class="font-mono">RM${d.normalBasePrice}</span></div>
+              <div class="flex justify-between"><span>${t.locationFee}:</span><span class="font-mono">RM${d.locationFee}</span></div>
+              <div class="flex justify-between font-semibold pt-2 border-t border-gray-200 dark:border-gray-600"><span>${t.subtotal}:</span><span class="font-mono">RM${d.normalPricePerPerson}</span></div>
+              <div class="flex justify-between text-sm text-gray-500"><span>${d.participants} &times; RM${d.normalPricePerPerson}</span></div>
+              <div class="flex justify-between text-xl font-bold text-gray-900 dark:text-white pt-4 border-t-2 border-gray-200 dark:border-gray-600"><span>${t.total}:</span><span class="font-mono">RM${d.normalTotal.toFixed(2)}</span></div>
+            </div>
+            <div class="p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700">
+              <h4 class="text-sm font-semibold mb-3 text-center text-gray-500 uppercase tracking-wide">${t.downloadNormalTitle}</h4>
+              <button onclick="generateQuotation('normal', 'docx', state.calculationData, state.lang)" class="w-full py-3 rounded-lg border-2 border-brand-red text-brand-red font-bold hover:bg-brand-red hover:text-white transition-all duration-300 flex items-center justify-center gap-2">
+                <span>📄</span> ${t.btnNormalDocx}
+              </button>
+            </div>
+          </div>
+
+          <!-- Discounted Price Card -->
+          <div class="bg-white dark:bg-brand-bgDarkSec rounded-2xl shadow-lg overflow-hidden border-2 border-brand-red flex flex-col relative">
+            <div class="absolute top-0 right-0 bg-brand-red text-white text-xs font-bold px-3 py-1 rounded-bl-xl z-10">${d.tier.discountPercent}% OFF</div>
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 bg-red-50 dark:bg-red-900/10">
+              <h3 class="text-xl font-bold text-brand-red text-center">${t.titleDiscount}</h3>
+            </div>
+            <div class="p-6 space-y-4 flex-grow text-gray-700 dark:text-gray-300">
+              <div class="flex justify-between"><span>${t.baseCourse}:</span><span class="font-mono">RM${d.discountedBasePrice}</span></div>
+              <div class="flex justify-between text-brand-red font-medium"><span>${t.discount}:</span><span class="font-mono">${d.tier.discountPercent}% OFF</span></div>
+              <div class="flex justify-between"><span>${t.locationFee}:</span><span class="font-mono">RM${d.locationFee}</span></div>
+              <div class="flex justify-between font-semibold pt-2 border-t border-gray-200 dark:border-gray-600"><span>${t.subtotal}:</span><span class="font-mono">RM${d.discountedPricePerPerson}</span></div>
+              <div class="flex justify-between text-sm text-gray-500"><span>${d.participants} &times; RM${d.discountedPricePerPerson}</span></div>
+              <div class="flex justify-between text-xl font-bold text-brand-red pt-4 border-t-2 border-gray-200 dark:border-gray-600"><span>${t.total}:</span><span class="font-mono">RM${d.discountedTotal.toFixed(2)}</span></div>
+              ${d.savings > 0 ? `<div class="text-center text-sm font-medium text-green-600 bg-green-100 dark:bg-green-900/30 py-2 rounded-lg mt-2">You Save: RM${d.savings.toFixed(2)}</div>` : ''}
+            </div>
+            <div class="p-6 bg-red-50 dark:bg-red-900/10 border-t border-gray-100 dark:border-gray-700">
+              <h4 class="text-sm font-semibold mb-3 text-center text-brand-red uppercase tracking-wide">${t.downloadDiscountTitle}</h4>
+              <button onclick="generateQuotation('discount', 'docx', state.calculationData, state.lang)" class="w-full py-3 rounded-lg bg-brand-red text-white font-bold hover:bg-brand-darkRed shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
+                <span>📄</span> ${t.btnDiscountDocx}
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // --- Event Listeners ---
+      els.btnLang.addEventListener('click', () => {
+        state.lang = state.lang === 'en' ? 'ms' : 'en';
+        updateLanguageUI();
+      });
+
+      els.btnTheme.addEventListener('click', () => {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        if (state.theme === 'dark') {
+          els.html.classList.add('dark');
+          els.dotTheme.classList.add('translate-x-5');
+          els.lblThemeLight.classList.remove('text-yellow-500');
+          els.lblThemeLight.classList.add('text-gray-500');
+          els.lblThemeDark.classList.add('text-blue-400');
+          els.lblThemeDark.classList.remove('text-gray-500');
+        } else {
+          els.html.classList.remove('dark');
+          els.dotTheme.classList.remove('translate-x-5');
+          els.lblThemeLight.classList.add('text-yellow-500');
+          els.lblThemeLight.classList.remove('text-gray-500');
+          els.lblThemeDark.classList.remove('text-blue-400');
+          els.lblThemeDark.classList.add('text-gray-500');
+        }
+      });
+
+      els.inputCourse.addEventListener('change', (e) => state.courseType = e.target.value);
+      els.inputLocation.addEventListener('change', (e) => state.location = e.target.value);
+      els.inputParticipants.addEventListener('change', (e) => state.participants = parseInt(e.target.value) || 0);
+      
+      els.btnCalculate.addEventListener('click', () => {
+        if (!state.courseType || !state.location || state.participants < 1) {
+          alert(state.lang === 'en' ? 'Please fill in all fields' : 'Sila isi semua ruangan');
+          return;
+        }
+        state.calculationData = calculatePrice(state.courseType, state.location, state.participants);
+        renderResults();
+        
+        setTimeout(() => {
+          document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      });
+
+      // --- Initialization ---
+      els.year.textContent = new Date().getFullYear();
+      updateLanguageUI(); // Initial render
+
+      // Expose state and function to window for inline onclick handlers in template strings
+      window.state = state;
+      window.generateQuotation = generateQuotation;
+
+    </script>
   </body>
 </html>
