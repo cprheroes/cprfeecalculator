@@ -79,7 +79,7 @@ const App: React.FC = () => {
             {/* Logo - Updated for the new circular logo file */}
             <div className="mb-4">
               <img 
-                src="logo.png" 
+                src="/assets/logo.png" 
                 alt="CPR Hero Logo" 
                 className="h-32 w-32 object-contain rounded-full shadow-md bg-white"
                 onError={(e) => {
