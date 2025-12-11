@@ -33,12 +33,24 @@
             },
             keyframes: {
               glowBlue: {
-                '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
-                '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' },
+                '0%, 100%': { 
+                  boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.05)'
+                },
+                '50%': { 
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.2)'
+                },
               },
               glowRed: {
-                '0%, 100%': { boxShadow: '0 0 5px rgba(239, 68, 68, 0.5)' },
-                '50%': { boxShadow: '0 0 20px rgba(239, 68, 68, 0.8)' },
+                '0%, 100%': { 
+                  boxShadow: '0 0 5px rgba(239, 68, 68, 0.5)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.05)'
+                },
+                '50%': { 
+                  boxShadow: '0 0 20px rgba(239, 68, 68, 0.8)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.2)'
+                },
               },
               textGlowRed: {
                 '0%, 100%': { textShadow: '0 0 4px rgba(220, 53, 69, 0.5)' },
@@ -437,10 +449,11 @@
           let rowClass = "border-b border-gray-200 dark:border-gray-600 ";
           rowClass += index % 2 !== 0 ? "bg-gray-50 dark:bg-gray-800 " : "bg-white dark:bg-brand-bgDarkSec ";
           
+          // Added transform-gpu to force hardware acceleration on mobile
           if (tier.style === 'blue') {
-            rowClass += " animate-glow-blue border-2 border-blue-400 dark:border-blue-500 z-10 relative";
+            rowClass += " animate-glow-blue border-2 border-blue-400 dark:border-blue-500 z-10 relative transform-gpu";
           } else if (tier.style === 'red') {
-            rowClass += " animate-glow-red border-2 border-brand-red dark:border-red-500 z-10 relative";
+            rowClass += " animate-glow-red border-2 border-brand-red dark:border-red-500 z-10 relative transform-gpu";
           }
 
           const labelHtml = tier.label ? 
