@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CPR Hero Price Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                red: '#dc3545',
+                darkRed: '#c82333',
+                bgDark: '#1a1a1a',
+                bgDarkSec: '#2d2d2d',
+              }
+            },
+            animation: {
+              'glow-blue': 'glowBlue 2s infinite',
+              'glow-red': 'glowRed 2s infinite',
+              'text-glow-red': 'textGlowRed 2s infinite',
+            },
+            keyframes: {
+              glowBlue: {
+                '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
+                '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8)' },
+              },
+              glowRed: {
+                '0%, 100%': { boxShadow: '0 0 5px rgba(239, 68, 68, 0.5)' },
+                '50%': { boxShadow: '0 0 20px rgba(239, 68, 68, 0.8)' },
+              },
+              textGlowRed: {
+                '0%, 100%': { textShadow: '0 0 4px rgba(220, 53, 69, 0.5)' },
+                '50%': { textShadow: '0 0 15px rgba(220, 53, 69, 1)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Custom scrollbar for better aesthetics */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .dark ::-webkit-scrollbar-track {
+        background: #2d2d2d;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/"
+  }
+}
+</script>
+</head>
+  <body class="bg-gray-50 dark:bg-brand-bgDark transition-colors duration-300">
+    <div id="root"></div>
+  </body>
+</html>
